@@ -5,9 +5,9 @@ function Square(props) {
       return (
         <button
         className="square"
-        onClick={() => this.props.onClick()}
+        onClick={props.onClick}
       >
-        {this.props.value}
+        {props.value}
       </button>
       );
     }
@@ -23,19 +23,29 @@ function Square(props) {
       }
       handleClick(i) {
         const squares = this.state.squares.slice();
+        if (calculateWinner(squares) || squares[i]) {
+            return;
+          }
         squares[i] = this.state.xIsNext ? 'X' : 'O';
-        this.setState({squares: squares,
+        this.setState({
+            squares: squares,
             xIsNext: !this.state.xIsNext,});
       }
     renderSquare(i) {
-        return (<Square value={this.state.squares[i]} 
+        return (
+        <Square value={this.state.squares[i]} 
         onClick={() => this.handleClick(i)}/>
         )
     }
   
     render() {
-      const status = 'Next player: X' + (this.state.xIsNext ? 'X' : 'O');
-  
+        const winner = calculateWinner(this.state.squares);
+        let status;
+        if (winner) {
+          status = 'Winner: ' + winner;
+        } else {
+          status = 'Next player: ' + (this.state.xIsNext ? 'X' : 'O');
+        }  
       return (
         <div>
           <div className="status">{status}</div>
@@ -61,13 +71,7 @@ function Square(props) {
   
   class Game extends React.Component {
     render() {
-        const winner = calculateWinner(this.state.squares);
-        let status;
-        if (winner) {
-          status = 'Winner: ' + winner;
-        } else {
-          status = 'Next player: ' + (this.state.xIsNext ? 'X' : 'O');
-        }
+
       return (
         <div className="game">
           <div className="game-board">
@@ -81,7 +85,14 @@ function Square(props) {
       );
     }
   }
-//helper function
+
+  // ========================================
+  
+  ReactDOM.render(
+    <Game />,
+    document.getElementById('root')
+  );
+  //helper function
   function calculateWinner(squares) {
     const lines = [
       [0, 1, 2],
@@ -101,11 +112,4 @@ function Square(props) {
     }
     return null;
   }
-  
-  // ========================================
-  
-  ReactDOM.render(
-    <Game />,
-    document.getElementById('root')
-  );
   
